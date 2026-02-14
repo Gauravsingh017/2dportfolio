@@ -33,14 +33,14 @@
         /* --- 1. 3D BACKGROUND --- */
         .fixed-bg {
             position: fixed; inset: 0; z-index: -20;
-            background-image: url('images/layer-bg.png');
+            background-image: url('layer-bg.png');
             background-size: cover; background-position: center;
             opacity: 0.3; filter: grayscale(100%) contrast(1.2);
         }
         
         .l-dust { 
             position: fixed; inset: 0; z-index: -10;
-            background-image: url('images/overlay-dust.png'); 
+            background-image: url('overlay-dust.png'); 
             opacity: 0.4; mix-blend-mode: screen; pointer-events: none;
         }
 
@@ -187,8 +187,8 @@
 
     <div class="fixed-bg"></div>
     <div class="l-dust"></div>
-    <img src="images/tech-arm.png" class="l-arm-3d" alt="Robotic Arm">
-    <img src="images/tech-code.png" class="l-code-3d" alt="Holographic Code">
+    <img src="tech-arm.png" class="l-arm-3d" alt="Robotic Arm">
+    <img src="tech-code.png" class="l-code-3d" alt="Holographic Code">
 
     <nav class="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center mix-blend-normal">
         <a href="index.html" class="font-display font-bold text-xl tracking-tighter text-white z-50 relative">GAURAV<span class="text-accent">.AI</span></a>
@@ -362,4 +362,5 @@
         });
     </script>
 </body>
+
 </html>
