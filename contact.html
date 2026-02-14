@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Gaurav Singh Patel</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { display: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: { accent: '#3B82F6', cricket: '#10B981', surface: '#0A0A0A' }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+
+    <style>
+        body { background-color: #030303; color: white; overflow-x: hidden; }
+        
+        /* --- 1. 3D BACKGROUND --- */
+        .fixed-bg {
+            position: fixed; inset: 0; z-index: -20;
+            background-image: url('images/layer-bg.png');
+            background-size: cover; background-position: center;
+            opacity: 0.3; filter: grayscale(100%) contrast(1.2);
+        }
+        
+        .l-dust { 
+            position: fixed; inset: 0; z-index: -10;
+            background-image: url('images/overlay-dust.png'); 
+            opacity: 0.4; mix-blend-mode: screen; pointer-events: none;
+        }
+
+        /* --- 2. 3D FLOATING ELEMENTS (LOCKED POSITIONS) --- */
+        
+        /* Robotic Arm -> BOTTOM RIGHT */
+        .l-arm-3d {
+            position: fixed; 
+            right: -5%; bottom: -10%; 
+            height: 75vh; width: auto; 
+            z-index: -5;
+            opacity: 0.6; 
+            mix-blend-mode: screen; 
+            pointer-events: none;
+            transform: scaleX(-1); /* Flip horizontally */
+            animation: floatArm 12s ease-in-out infinite;
+        }
+
+        /* Code Hologram -> TOP LEFT */
+        .l-code-3d {
+            position: fixed; 
+            left: -10%; top: 5%; 
+            height: 60vh; width: auto; 
+            z-index: -5;
+            opacity: 0.3; 
+            mix-blend-mode: screen; 
+            pointer-events: none;
+            animation: floatCode 20s linear infinite;
+        }
+
+        @keyframes floatArm { 
+            0%, 100% { transform: translateY(0) scaleX(-1) rotate(0deg); } 
+            50% { transform: translateY(-30px) scaleX(-1) rotate(-2deg); } 
+        }
+        @keyframes floatCode { 
+            0% { transform: translateY(0); } 
+            50% { transform: translateY(-40px); } 
+            100% { transform: translateY(0); } 
+        }
+
+        @media (max-width: 768px) {
+            .l-arm-3d { height: 40vh; right: -20%; bottom: 0; opacity: 0.3; }
+            .l-code-3d { height: 30vh; left: -20%; top: 0; opacity: 0.2; }
+        }
+
+        /* --- 3. PILL NAVIGATION --- */
+        .nav-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 9999px;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em;
+            transition: all 0.3s ease; color: #d1d5db;
+        }
+        .nav-pill:hover, .nav-pill.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- 4. GLASS UI --- */
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            background: rgba(30, 30, 40, 0.7);
+            transform: translateY(-5px);
+        }
+
+        /* FORM INPUTS */
+        .hud-input {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white; font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+        }
+        .hud-input:focus {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        select.hud-input {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+
+        /* SOCIALS */
+        /* --- SOCIAL BUTTONS --- */
+        .social-btn {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; transition: all 0.3s ease; 
+            color: #9ca3af; /* Default Gray Icon */
+            backdrop-filter: blur(5px);
+        }
+
+        /* 1. GITHUB: White Glow & Black Icon */
+        .social-github:hover { 
+            background: #ffffff; 
+            color: #000000; 
+            border-color: #ffffff;
+            transform: scale(1.1); 
+            box-shadow: 0 0 20px rgba(255,255,255,0.4); 
+        }
+
+        /* 2. LINKEDIN: Brand Blue (#0077b5) */
+        .social-linkedin:hover { 
+            background: #0077b5; 
+            color: #ffffff; 
+            border-color: #0077b5;
+            transform: scale(1.1); 
+            box-shadow: 0 0 20px rgba(0, 119, 181, 0.4); 
+        }
+
+        /* 3. INSTAGRAM: Brand Gradient */
+        .social-instagram:hover { 
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
+            color: #ffffff; 
+            border-color: #dc2743;
+            transform: scale(1.1); 
+            box-shadow: 0 0 20px rgba(220, 39, 67, 0.4); 
+        }
+        /* MOBILE DRAWER */
+        .mobile-drawer { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .mobile-drawer.open { transform: translateX(0); }
+        .drawer-backdrop { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="fixed-bg"></div>
+    <div class="l-dust"></div>
+    <img src="images/tech-arm.png" class="l-arm-3d" alt="Robotic Arm">
+    <img src="images/tech-code.png" class="l-code-3d" alt="Holographic Code">
+
+    <nav class="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center mix-blend-normal">
+        <a href="index.html" class="font-display font-bold text-xl tracking-tighter text-white z-50 relative">GAURAV<span class="text-accent">.AI</span></a>
+        
+        <div class="hidden md:flex flex-wrap justify-center gap-3 font-mono">
+            <a href="index.html" class="nav-pill">HOME</a>
+            <a href="about.html" class="nav-pill">ABOUT</a>
+            <a href="portfolio.html" class="nav-pill">WORK</a>
+            <a href="services.html" class="nav-pill">SERVICES</a>
+            <a href="contact.html" class="nav-pill active">CONTACT</a>
+        </div>
+
+        <button id="mobile-menu-btn" class="md:hidden z-50 relative p-2 text-white hover:text-accent transition-colors">
+            <span class="material-symbols-outlined text-3xl">menu</span>
+        </button>
+    </nav>
+
+    <div id="drawer-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 drawer-backdrop" onclick="toggleDrawer()"></div>
+    <div id="mobile-drawer" class="fixed top-0 right-0 h-full w-[75%] max-w-sm bg-[#050505] border-l border-white/10 z-50 mobile-drawer p-8 flex flex-col justify-between shadow-2xl">
+        <div class="flex justify-end"><button onclick="toggleDrawer()" class="p-2 text-white/50 hover:text-white"><span class="material-symbols-outlined text-3xl">close</span></button></div>
+        <div class="flex flex-col gap-6 mt-10">
+            <a href="index.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">01</span> HOME</a>
+            <a href="about.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">02</span> ABOUT</a>
+            <a href="portfolio.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">03</span> WORK</a>
+            <a href="services.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">04</span> SERVICES</a>
+            <a href="contact.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">05</span> CONTACT</a>
+        </div>
+        <div class="border-t border-white/10 pt-8">
+            <p class="text-white/40 text-xs font-mono mb-4">CONNECT</p>
+            <div class="flex gap-6">
+                <a href="https://github.com/Gauravsingh017" target="_blank" class="text-white hover:text-accent"><i class="fa-brands fa-github text-xl"></i></a>
+                <a href="https://www.linkedin.com/in/gaurav-singh-patel-2a6677330" target="_blank" class="text-white hover:text-accent"><i class="fa-brands fa-linkedin-in text-xl"></i></a>
+                <a href="https://www.instagram.com/gauravsingh_017/" target="_blank" class="text-white hover:text-accent"><i class="fa-brands fa-instagram text-xl"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <main class="min-h-screen pt-32 pb-20 px-6 max-w-7xl mx-auto relative z-10">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
+            
+            <div class="lg:col-span-5 flex flex-col gap-8 pt-10 animate-fade-in">
+                
+                <div class="flex flex-col gap-4">
+                    <h1 class="text-5xl md:text-7xl font-bold leading-tight tracking-tight text-white">
+                        Let's build something <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">extraordinary.</span>
+                    </h1>
+                    <p class="text-lg text-gray-400 leading-relaxed font-mono">
+                        Have a project in mind? Whether it's a Python script, Graphic design, complex AI integration, or cricket strategy, I'm ready to help.
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <a href="mailto:gauravsingh139717@gmail.com" class="glass-panel p-5 rounded-2xl flex items-center gap-5 cursor-pointer group" data-tilt data-tilt-max="3">
+                        <div class="flex items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0 w-12 h-12 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined text-2xl">mail</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-500 font-mono font-bold uppercase tracking-wider">Email</span>
+                            <span class="text-base font-bold text-white group-hover:text-blue-400 transition-colors">gauravsingh139717@gmail.com</span>
+                        </div>
+                    </a>
+
+                    <div class="glass-panel p-5 rounded-2xl flex items-center gap-5" data-tilt data-tilt-max="3">
+                        <div class="flex items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0 w-12 h-12">
+                            <span class="material-symbols-outlined text-2xl">location_on</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-500 font-mono font-bold uppercase tracking-wider">Location</span>
+                            <span class="text-base font-bold text-white">Indore, India 🇮🇳</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <h4 class="text-[10px] font-mono font-bold uppercase tracking-wider text-gray-500 mb-4">Connect with me</h4>
+                    <div class="flex gap-4">
+                       <a href="https://github.com/Gauravsingh017" target="_blank" class="social-btn social-github">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+                
+                <a href="https://www.linkedin.com/in/gaurav-singh-patel-2a6677330" target="_blank" class="social-btn social-linkedin">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+                
+                <a href="https://www.instagram.com/gauravsingh_017/" target="_blank" class="social-btn social-instagram">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="glass-panel rounded-3xl p-8 md:p-10 relative z-20" data-tilt data-tilt-max="2" data-tilt-glare data-tilt-max-glare="0.05">
+                    
+                    <form action="https://formspree.io/f/xdaklnqk" class="space-y-6" method="POST">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400 ml-1">Your Name</label>
+                                <input class="hud-input w-full rounded-xl px-4 py-4 text-sm" name="name" type="text" placeholder="John Doe" required/>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400 ml-1">Email Address</label>
+                                <input class="hud-input w-full rounded-xl px-4 py-4 text-sm" name="email" type="email" placeholder="john@example.com" required/>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400 ml-1">
+                                    Phone <span class="text-green-500 font-normal normal-case">(Fastest Reply ⚡)</span>
+                                </label>
+                                <input class="hud-input w-full rounded-xl px-4 py-4 text-sm" name="phone" type="tel" placeholder="+91 98765 43210" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400 ml-1">Subject</label>
+                                <select class="hud-input w-full appearance-none rounded-xl px-4 py-4 text-sm cursor-pointer" name="subject">
+                                    <option>General Inquiry</option>
+                                    <option>AI/ML Project</option>
+                                    <option>Graphic Design</option>
+                                    <option>Freelance Opportunity</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400 ml-1">Message</label>
+                            <textarea class="hud-input w-full rounded-xl px-4 py-4 text-sm min-h-[150px]" name="message" placeholder="Tell me about your project..." required></textarea>
+                        </div>
+                        
+                        <div class="pt-2">
+                            <button class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-blue-500/25 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2" type="submit">
+                                Send Message <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="relative z-30 max-w-[1100px] mx-auto px-4 pb-10 text-center border-t border-white/5 pt-10 mt-auto">
+        <h3 class="text-xl font-bold mb-4 text-white">Ready to create something?</h3>
+        <p class="text-xs text-gray-500 font-mono">© 2026 Gaurav Singh Patel. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Init Tilt
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"));
+
+        // Mobile Drawer Logic
+        function toggleDrawer() {
+            const drawer = document.getElementById('mobile-drawer');
+            const backdrop = document.getElementById('drawer-backdrop');
+            drawer.classList.toggle('open');
+            if (drawer.classList.contains('open')) {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.add('open'), 10);
+            } else {
+                backdrop.classList.remove('open');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleDrawer);
+
+        // Entrance Anim
+        gsap.from(".animate-fade-in", {
+            y: 30, opacity: 0, duration: 0.8, stagger: 0.2, ease: "power3.out"
+        });
+    </script>
+</body>
+</html>

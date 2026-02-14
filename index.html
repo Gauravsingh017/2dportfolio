@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaurav Singh Patel | AI Engineer</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { display: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: { accent: '#3B82F6', cricket: '#10B981' }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        body { background-color: #030303; color: white; overflow-x: hidden; margin: 0; }
+        
+        /* THE STAGE */
+        .stage {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            will-change: transform;
+        }
+
+        /* --- 1. BACKGROUND LAYERS --- */
+        .l-bg { 
+            z-index: 0; 
+            background-image: url('images/layer-bg.png'); 
+            scale: 1.1; 
+            filter: brightness(0.6); 
+        }
+        
+        .l-dust { 
+            z-index: 1; 
+            background-image: url('images/overlay-dust.png'); 
+            opacity: 0.5; 
+            mix-blend-mode: screen; /* Removes black background */
+        }
+
+        /* --- 2. TECH LAYERS (Midground) --- */
+        .l-arm { 
+            z-index: 5; 
+            background-image: url('images/tech-arm.png'); 
+            background-size: 50%; 
+            background-repeat: no-repeat;
+            background-position: 90% 40%;
+            opacity: 0.6;
+            mix-blend-mode: screen; 
+        }
+
+        .l-cloud { 
+            z-index: 6; 
+            background-image: url('images/tech-cloud.png'); 
+            background-size: 25%; 
+            background-repeat: no-repeat;
+            background-position: 15% 30%;
+            opacity: 0.8;
+            mix-blend-mode: screen; /* Tries to hide background */
+        }
+
+        .l-code { 
+            z-index: 7; 
+            background-image: url('images/tech-code.png'); 
+            background-size: 40%; 
+            background-repeat: no-repeat;
+            background-position: 80% 60%;
+            opacity: 0.7;
+            mix-blend-mode: screen; /* Removes black background */
+        }
+
+        /* --- 3. HERO LAYER (You) --- */
+        .l-hero { 
+            z-index: 10; 
+            background-image: url('images/layer-hero.png'); 
+            background-size: contain; 
+            background-repeat: no-repeat;
+            background-position: bottom center;
+            transform-origin: bottom center;
+            /* Note: Convert this image to PNG for best results! */
+        }
+
+        /* --- 4. PROP LAYERS (Foreground) --- */
+        .l-prop-badge { 
+            z-index: 20; 
+            background-image: url('images/layer-props1.png'); 
+            background-size: 150px; 
+            background-repeat: no-repeat;
+            background-position: 20% 60%; 
+            filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
+            /* mix-blend-mode: screen; Optional: Uncomment if black bg */
+        }
+
+        .l-prop-ball { 
+            z-index: 25; 
+            background-image: url('images/layer-props2.png'); 
+            background-size: 100px; 
+            background-repeat: no-repeat;
+            background-position: 80% 80%; 
+            filter: blur(2px); 
+        }
+
+        /* --- 5. OVERLAYS --- */
+
+        
+
+        .l-vignette {
+            z-index: 31;
+            background-image: url('images/overlay-vignette.png');
+            mix-blend-mode: multiply;
+            opacity: 0.8;
+            background-size: cover;
+            pointer-events: none;
+        }
+
+        /* UI TEXT LAYER */
+        .ui-layer {
+            position: relative;
+            z-index: 50;
+            text-align: center;
+            pointer-events: none;
+            margin-top: -5vh;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+        }
+        
+        .glass-btn {
+            pointer-events: auto;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        .glass-btn:hover { background: rgba(59,130,246,0.2); border-color: #3B82F6; }
+
+        /* SOCIAL ICONS */
+        .social-link {
+            pointer-events: auto;
+            width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .social-link:hover { transform: translateY(-5px); background: white; color: black; }
+
+        #loader {
+            position: fixed; inset: 0; z-index: 999;
+            background: #000;
+            display: flex; justify-content: center; align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="text-accent font-mono animate-pulse tracking-widest">LOADING NEURAL LINK...</div>
+    </div>
+
+    <nav class="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center text-white mix-blend-difference">
+        <div class="font-display font-bold text-xl tracking-tighter">GAURAV<span class="text-accent">.AI</span></div>
+        <div class="flex gap-6 text-sm font-mono opacity-70">
+            <a href="about.html" class="hover:text-white hover:opacity-100 transition">ABOUT</a>
+            <a href="portfolio.html" class="hover:text-white hover:opacity-100 transition">WORK</a>
+            <a href="contact.html" class="hover:text-white hover:opacity-100 transition">CONTACT</a>
+        </div>
+    </nav>
+
+    <main class="h-[250vh]"> <div class="stage fixed top-0 left-0 w-full h-screen">
+            
+            <div class="layer l-bg" data-speed="0.1"></div>
+            <div class="layer l-dust" data-speed="0.2"></div>
+            
+            <div class="layer l-arm" data-speed="0.2"></div>
+            <div class="layer l-cloud" data-speed="0.3"></div>
+            <div class="layer l-code" data-speed="0.4"></div>
+            
+            <div class="layer l-hero" data-speed="0.5"></div>
+            
+            <div class="layer l-prop-badge" data-speed="0.8"></div> 
+            <div class="layer l-prop-ball" data-speed="1.2"></div>
+            
+            <div class="layer l-flare" id="mouse-flare"></div>
+            <div class="layer l-vignette"></div>
+
+            <div class="ui-layer">
+                <div class="inline-block px-4 py-1 rounded-full border border-green-500/30 bg-green-500/10 text-green-400 text-xs font-mono mb-6 tracking-widest uppercase">
+                    Open To Work
+                </div>
+                <h1 class="text-6xl md:text-9xl font-black tracking-tighter mb-4 leading-none">
+                    DESIGNER<span class="text-accent">.</span><br>
+                    ENGINEER<span class="text-gray-600">.</span>
+                </h1>
+                <p class="text-gray-300 max-w-lg mx-auto font-mono text-sm mb-8 leading-relaxed">
+                    Bridging the gap between <strong class="text-white">AI Logic</strong> and <strong class="text-white">Visual Aesthetics</strong>.<br>
+                </p>
+                
+                <div class="flex justify-center gap-4 mb-8">
+                    <a href="portfolio.html" class="glass-btn px-8 py-4 rounded-full text-white font-bold text-sm tracking-wide">
+                        VIEW WORK
+                    </a>
+                </div>
+
+                <div class="flex justify-center gap-4">
+                    <a href="https://github.com/Gauravsingh017" target="_blank" class="social-link">
+                        <i class="fa-brands fa-github"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/gaurav-singh-patel-2a6677330" target="_blank" class="social-link">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://www.instagram.com/gauravsingh_017/" target="_blank" class="social-link">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <section class="relative z-50 py-32 px-6">
+        
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-xl border-t border-white/10"></div>
+
+        <div class="relative max-w-6xl mx-auto z-10">
+            
+            <div class="text-center mb-20">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500">
+                    Explore My Universe
+                </h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg font-mono">
+                    Scroll through the dimensions of my work, where code meets creativity.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                
+                <div class="group p-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_50px_rgba(59,130,246,0.2)]">
+                    <div class="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform border border-blue-500/30">
+                        <i class="fa-solid fa-brain text-blue-400 text-3xl shadow-[0_0_15px_rgba(59,130,246,0.5)]"></i>
+                    </div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">GenAI & ML</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Building intelligent systems using Python & TensorFlow that adapt, learn, and evolve with user interaction.
+                    </p>
+                </div>
+
+                <div class="group p-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_50px_rgba(16,185,129,0.2)]">
+                    <div class="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform border border-green-500/30">
+                        <i class="fa-brands fa-aws text-green-400 text-4xl shadow-[0_0_15px_rgba(16,185,129,0.5)]"></i>
+                    </div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">Cloud Architecture</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Scalable, serverless infrastructure designed on AWS. S3, DynamoDB, and Lambda integration.
+                    </p>
+                </div>
+
+                <div class="group p-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_50px_rgba(236,72,153,0.2)]">
+                    <div class="w-16 h-16 rounded-2xl bg-pink-500/20 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform border border-pink-500/30">
+                        <i class="fa-solid fa-pen-nib text-pink-400 text-3xl shadow-[0_0_15px_rgba(236,72,153,0.5)]"></i>
+                    </div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">Creative Design</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Visual storytelling through Canva & Code. Creating interfaces that don't just work, but feel alive.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+        
+        <footer class="relative z-10 mt-32 border-t border-white/10 pt-16 pb-8 text-center">
+            
+            <h3 class="text-lg font-bold mb-8 text-white">Connect with me</h3>
+
+            <div class="flex justify-center gap-6 mb-12">
+                <a href="https://github.com/Gauravsingh017" target="_blank" class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all hover:scale-110 hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] group">
+                    <i class="fa-brands fa-github text-2xl group-hover:animate-bounce"></i>
+                </a>
+                
+                <a href="https://www.linkedin.com/in/gaurav-singh-patel-2a6677330" target="_blank" class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#0077b5] hover:text-white transition-all hover:scale-110 hover:shadow-[0_0_20px_rgba(0,119,181,0.5)] group">
+                    <i class="fa-brands fa-linkedin-in text-2xl group-hover:animate-pulse"></i>
+                </a>
+                
+                <a href="https://www.instagram.com/gauravsingh_017/" target="_blank" class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:text-white transition-all hover:scale-110 hover:shadow-[0_0_20px_rgba(220,39,67,0.5)] group">
+                    <i class="fa-brands fa-instagram text-2xl group-hover:rotate-12 transition-transform"></i>
+                </a>
+            </div>
+
+            <p class="text-gray-600 font-mono text-xs tracking-widest uppercase">
+                © 2026 Gaurav Singh Patel. Built with Intelligence.
+            </p>
+        </footer>
+
+    </section>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Remove Loader
+        window.onload = () => {
+            gsap.to("#loader", { opacity: 0, duration: 1, pointerEvents: "none" });
+        }
+
+        // Parallax Logic
+        gsap.utils.toArray(".layer").forEach(layer => {
+            const speed = layer.getAttribute("data-speed");
+            if(speed) {
+                gsap.to(layer, {
+                    yPercent: -20 * speed,
+                    scale: 1 + (0.05 * speed),
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: "body",
+                        start: "top top",
+                        end: "bottom top",
+                        scrub: 0
+                    }
+                }); 
+            }
+        });
+
+        // Fade out Text
+        gsap.to(".ui-layer", {
+            opacity: 0,
+            y: -100,
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "500px top",
+                scrub: true
+            }
+        });
+
+        // Mouse Flare
+        document.addEventListener("mousemove", (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 30;
+            const y = (e.clientY / window.innerHeight - 0.5) * 30;
+            gsap.to("#mouse-flare", { x: x, y: y, duration: 1, ease: "power2.out" });
+        });
+    </script>
+</body>
+</html>

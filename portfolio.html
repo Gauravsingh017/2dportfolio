@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work | Gaurav Singh Patel</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { display: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: { accent: '#3B82F6', cricket: '#10B981', surface: '#0A0A0A' }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        body { background-color: #030303; color: white; overflow-x: hidden; }
+        
+        /* BACKGROUND LAYERS */
+        .fixed-bg {
+            position: fixed; inset: 0; z-index: -10;
+            background-image: url('images/layer-bg.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4;
+            filter: grayscale(80%) contrast(1.2) brightness(0.5);
+        }
+        
+        .l-dust { 
+            position: fixed; inset: 0; z-index: -9;
+            background-image: url('images/overlay-dust.png'); 
+            opacity: 0.3; 
+            mix-blend-mode: screen; 
+            pointer-events: none;
+        }
+
+        .l-vignette {
+            position: fixed; inset: 0; z-index: -8;
+            background-image: url('images/overlay-vignette.png');
+            mix-blend-mode: multiply;
+            opacity: 0.8;
+            background-size: cover;
+            pointer-events: none;
+        }
+
+        /* PILL NAV LINKS (Desktop) */
+        .nav-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            color: #d1d5db;
+        }
+        .nav-pill:hover, .nav-pill.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        /* SIDE DRAWER (Mobile) */
+        .mobile-drawer {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mobile-drawer.open {
+            transform: translateX(0);
+        }
+        .drawer-backdrop {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .drawer-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* FILTER BUTTONS */
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 24px;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #9ca3af;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #3B82F6;
+            color: white;
+            border-color: #3B82F6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+
+        /* PROJECT CARD */
+        .project-card {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+        .project-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+        }
+        .project-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.2) 60%, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .project-card:hover .project-overlay { opacity: 1; }
+        
+        /* Fade Animation for Filtering */
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="fixed-bg"></div>
+    <div class="l-dust"></div>
+    <div class="l-vignette"></div>
+
+    <nav class="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center mix-blend-normal">
+        <a href="index.html" class="font-display font-bold text-xl tracking-tighter text-white z-50 relative">GAURAV<span class="text-accent">.AI</span></a>
+        
+        <div class="hidden md:flex flex-wrap justify-center gap-3 font-mono">
+            <a href="index.html" class="nav-pill">HOME</a>
+            <a href="about.html" class="nav-pill">ABOUT</a>
+            <a href="portfolio.html" class="nav-pill active">WORK</a>
+            <a href="services.html" class="nav-pill">SERVICES</a>
+            <a href="contact.html" class="nav-pill">CONTACT</a>
+        </div>
+
+        <button id="mobile-menu-btn" class="md:hidden z-50 relative p-2 text-white hover:text-accent transition-colors">
+            <span class="material-symbols-outlined text-3xl">menu</span>
+        </button>
+    </nav>
+
+    <div id="drawer-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 drawer-backdrop" onclick="toggleDrawer()"></div>
+    <div id="mobile-drawer" class="fixed top-0 right-0 h-full w-[75%] max-w-sm bg-[#050505] border-l border-white/10 z-50 mobile-drawer p-8 flex flex-col justify-between shadow-2xl">
+        <div class="flex justify-end">
+            <button onclick="toggleDrawer()" class="p-2 text-white/50 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-3xl">close</span>
+            </button>
+        </div>
+        <div class="flex flex-col gap-6 mt-10">
+            <a href="index.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">01</span> HOME</a>
+            <a href="about.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">02</span> ABOUT</a>
+            <a href="portfolio.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">03</span> WORK</a>
+            <a href="services.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">04</span> SERVICES</a>
+            <a href="contact.html" class="text-2xl font-bold text-white hover:text-accent flex items-center gap-4"><span class="text-white/20 text-lg">05</span> CONTACT</a>
+        </div>
+        <div class="border-t border-white/10 pt-8">
+            <p class="text-white/40 text-xs font-mono mb-4">CONNECT</p>
+            <div class="flex gap-6">
+                <a href="https://github.com/Gauravsingh017" target="_blank" class="text-white hover:text-accent transition-colors"><i class="fa-brands fa-github text-xl"></i></a>
+                <a href="https://www.linkedin.com/in/gaurav-singh-patel-2a6677330" target="_blank" class="text-white hover:text-accent transition-colors"><i class="fa-brands fa-linkedin-in text-xl"></i></a>
+                <a href="https://www.instagram.com/gauravsingh_017/" target="_blank" class="text-white hover:text-accent transition-colors"><i class="fa-brands fa-instagram text-xl"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-32 md:py-40">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16 animate-fade-in">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
+                Creative <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Gallery</span>
+            </h1>
+            <p class="text-gray-400 text-lg font-mono">
+                A showcase of AI Prompt Engineering, Web Development, Graphic Design, and my journey on the Cricket pitch.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-16 animate-fade-in" style="animation-delay: 0.1s;">
+            <button data-filter="all" class="filter-btn active">All Work</button>
+            <button data-filter="web" class="filter-btn">Web & AI</button>
+            <button data-filter="design" class="filter-btn">Graphic Design</button>
+            <button data-filter="sports" class="filter-btn">Sports</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in" style="animation-delay: 0.2s;">
+            
+            <div class="project-card portfolio-item design group aspect-[16/9] lg:col-span-2 cursor-pointer" data-tilt data-tilt-max="2">
+                <img src="images/design-gta-gaurav.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="GTA V Design">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-8">
+                    <span class="text-xs font-bold text-accent uppercase tracking-wider mb-2">AI & Prompt Engineering</span>
+                    <h3 class="text-3xl font-bold text-white">GTA V Loading Screen</h3>
+                    <p class="text-gray-300 mt-1">Personalized Character Triptych generated via Stable Diffusion.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item web group p-6 flex flex-col justify-between" data-tilt>
+                <div class="rounded-xl overflow-hidden aspect-[4/3] w-full border border-white/10 mb-4">
+                    <img src="images/portfolio-screenshot.png" onerror="this.src='https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=1000&q=80'" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-1">Personal Portfolio</h3>
+                    <p class="text-sm text-gray-400 mb-4">Responsive, Dark Mode, GSAP Animations.</p>
+                    <div class="flex gap-2">
+                        <a href="https://gauravsingh017.github.io/portfolio/" target="_blank" class="flex-1 py-2 bg-accent text-white rounded-lg text-xs font-bold text-center hover:bg-blue-600 transition-colors">LIVE DEMO</a>
+                        <a href="https://github.com/Gauravsingh017/portfolio" target="_blank" class="flex-1 py-2 bg-white/10 text-white rounded-lg text-xs font-bold text-center hover:bg-white hover:text-black transition-colors">CODE</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item design group aspect-[4/5]" data-tilt>
+                <img src="images/design-tiger.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Tiger Design">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-2">Canva Design</span>
+                    <h3 class="text-xl font-bold text-white">Japanese Tiger</h3>
+                    <p class="text-gray-300 text-sm">Dark Fantasy Illustration.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item design group aspect-[4/5]" data-tilt>
+                <img src="images/design-rohit.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Rohit Sharma">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">Sports Art</span>
+                    <h3 class="text-xl font-bold text-white">Rohit Sharma</h3>
+                    <p class="text-gray-300 text-sm">"No Pain No Gain" Poster.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item design group aspect-[4/5]" data-tilt>
+                <img src="images/design-virat.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Virat Kohli">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">Sports Art</span>
+                    <h3 class="text-xl font-bold text-white">Virat Kohli</h3>
+                    <p class="text-gray-300 text-sm">Digital Illustration.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item design group aspect-[4/5]" data-tilt>
+                <img src="images/design-goku.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Goku">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-orange-400 uppercase tracking-wider mb-2">Anime Art</span>
+                    <h3 class="text-xl font-bold text-white">Goku - DBZ</h3>
+                    <p class="text-gray-300 text-sm">Character Poster Design.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item design group aspect-[4/5]" data-tilt>
+                <img src="images/design-be-bold.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Be Bold">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Merch Design</span>
+                    <h3 class="text-xl font-bold text-white">Be Bold</h3>
+                    <p class="text-gray-300 text-sm">Minimalist Typography.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item sports group aspect-[4/5]" data-tilt>
+                <img src="images/cricket-1.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Match Day">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-cricket uppercase tracking-wider mb-2">State Level</span>
+                    <h3 class="text-xl font-bold text-white">Match Day Focus</h3>
+                    <p class="text-gray-300 text-sm">Ready at the crease.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item sports group aspect-[4/5]" data-tilt>
+                <img src="images/cricket-2.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Team">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-cricket uppercase tracking-wider mb-2">State Level</span>
+                    <h3 class="text-xl font-bold text-white">The Squad</h3>
+                    <p class="text-gray-300 text-sm">Team coordination and strategy.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item sports group aspect-[4/5]" data-tilt>
+                <img src="images/cricket-3.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Practice">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-cricket uppercase tracking-wider mb-2">Training</span>
+                    <h3 class="text-xl font-bold text-white">Net Practice</h3>
+                    <p class="text-gray-300 text-sm">Refining the technique.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item sports group aspect-[4/5]" data-tilt>
+                <img src="images/cricket-4.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Finals">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-cricket uppercase tracking-wider mb-2">Tournament</span>
+                    <h3 class="text-xl font-bold text-white">Divisional Finals</h3>
+                    <p class="text-gray-300 text-sm">High pressure performance.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item sports group aspect-[4/5]" data-tilt>
+                <video class="w-full h-full object-cover" controls muted playsinline loop poster="images/cricket-5.jpeg">
+                    <source src="videos/cricket-practice.mp4" type="video/mp4">
+                </video>
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6 pointer-events-none">
+                    <span class="text-xs font-bold text-cricket uppercase tracking-wider mb-2">Analysis</span>
+                    <h3 class="text-xl font-bold text-white">Technique Breakdown</h3>
+                    <p class="text-gray-300 text-sm">Video Session.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item design group aspect-[4/5]" data-tilt>
+                <img src="images/design-reaper.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Reaper">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-2">Canva Design</span>
+                    <h3 class="text-xl font-bold text-white">The Adventure</h3>
+                    <p class="text-gray-300 text-sm">Retro Aesthetic.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item design group aspect-[4/5]" data-tilt>
+                <img src="images/design-beach.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Beach">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-2">T-Shirt Design</span>
+                    <h3 class="text-xl font-bold text-white">Beach Please</h3>
+                    <p class="text-gray-300 text-sm">Character Vector Art.</p>
+                </div>
+            </div>
+
+            <div class="project-card portfolio-item design group aspect-[4/5] bg-white flex items-center justify-center p-8" data-tilt>
+                <img src="images/design-logo.png" class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" alt="Logo">
+                <div class="absolute inset-0 project-overlay flex flex-col justify-end p-6">
+                    <span class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-2">Branding</span>
+                    <h3 class="text-xl font-bold text-white">Academy Logo</h3>
+                    <p class="text-gray-300 text-sm">Professional Identity.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-12 border-t border-white/5 text-gray-600 font-mono text-xs">
+        © 2026 Gaurav Singh Patel. Built with Intelligence.
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- FILTER LOGIC ---
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                const filterValue = button.getAttribute('data-filter');
+                
+                portfolioItems.forEach(item => {
+                    if (filterValue === 'all' || item.classList.contains(filterValue)) {
+                        item.classList.remove('hidden');
+                        item.classList.add('fade-in'); 
+                        // Reset animation class so it can play again
+                        setTimeout(() => item.classList.remove('fade-in'), 500);
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+                
+                // Refresh ScrollTrigger/Tilt after layout change
+                ScrollTrigger.refresh();
+            });
+        });
+
+        // --- MOBILE DRAWER LOGIC ---
+        function toggleDrawer() {
+            const drawer = document.getElementById('mobile-drawer');
+            const backdrop = document.getElementById('drawer-backdrop');
+            
+            drawer.classList.toggle('open');
+            
+            if (drawer.classList.contains('open')) {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.add('open'), 10);
+            } else {
+                backdrop.classList.remove('open');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleDrawer);
+
+        // --- TILT INIT ---
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+            max: 5,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.2,
+        });
+    </script>
+</body>
+</html>
